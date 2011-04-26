@@ -5,8 +5,8 @@ People asked for it, so I decided to put it out in the wild. Hope it's gonna be 
 Prerequisites
 =============
 
-* Groovy
-* OpenIfcTools
+* Groovy (http://groovy.org)
+* OpenIfcTools (http://www.openifctools.com)
 
 
 How to write IFC
@@ -47,7 +47,7 @@ Nice to read, isn't it?
 
 How to improve
 ==============
+I'd love to see these improvements, but I'm afraid I won't find the time. Don't hesitate to fork the project.
 * validate manifold Brep geometry
 * optimize ifc file: write each point once only (currently multiple times - once for every polygon)
-* representation counter example 
-
+* sophisticated example for reading/querying IFC (e.g. representation counter)

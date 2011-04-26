@@ -1,3 +1,10 @@
+/* Copyright (c) 2010-2011 Helga Tauscher
+ * http://github.com/hlg/GroovyIFC
+ *
+ * This file is part of Groovy Ifc Tools, which are distributed
+ * under the terms of the GNU General Public License version 3
+ */
+
 import openifctools.com.openifcjavatoolbox.ifcmodel.IfcModel
 import openifctools.com.openifcjavatoolbox.ifc2x3tc1.*
 
