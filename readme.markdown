@@ -12,6 +12,7 @@ Prerequisites
 How to write IFC
 ================
 This example shows how dae2ifc.groovy builds its IFC model
+
     def ifcBuilder = new IfcBuilder()
     ifcBuilder.proxy {
       globalId = globallyUniqueId('123456')
@@ -26,7 +27,9 @@ This example shows how dae2ifc.groovy builds its IFC model
       }
     }
     ifcBuilder.write("path/to/file", "file.ifc")
+
 This results in "file.ifc" with the following lines in its data part:
+
     #1= IFCSHAPEREPRESENTATION($,'Body','Brep',());
     #2= IFCPRODUCTDEFINITIONSHAPE($,$,(#1));
     #3= IFCPROXY('123456',$,$,$,$,$,#2,$,$);
@@ -35,6 +38,7 @@ This results in "file.ifc" with the following lines in its data part:
 How to read IFC
 ===============
 Just read in and use GPath. You could do something like this:
+
     def model = new IfcModel()
     model.readStepFile("file.ifc")
     def products = model.ifcObjects.findAll{ it instanceof IfcProduct }
@@ -43,11 +47,13 @@ Just read in and use GPath. You could do something like this:
     products.findAll{prod ->
       ! prod.representation?.representations.any{it -> !it.items.isEmpty()}
     }
+
 Nice to read, isn't it?
 
 How to improve
 ==============
 I'd love to see these improvements, but I'm afraid I won't find the time. Don't hesitate to fork the project.
+
 * validate manifold Brep geometry
 * optimize ifc file: write each point once only (currently multiple times - once for every polygon)
 * sophisticated example for reading/querying IFC (e.g. representation counter)
