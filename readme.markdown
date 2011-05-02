@@ -5,8 +5,8 @@ People asked for it, so I decided to put it out in the wild. Hope it's gonna be 
 Prerequisites
 =============
 
-* Groovy (http://groovy.org)
-* OpenIfcTools (http://www.openifctools.com)
+* [Groovy](http://groovy.codehaus.org/)
+* [OpenIfcTools](http://www.openifctools.com)
 
 
 How to write IFC
