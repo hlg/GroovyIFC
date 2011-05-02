@@ -30,7 +30,6 @@ def collectPoints(mesh) {
 def shell = []
 meshes.each { mesh ->
   def loops = []
-  // TODO polylist.each ...
   if (!mesh.polylist.isEmpty()) {
     assert mesh.polylist.input.@source.text()[1..-1] == mesh.vertices.@id.toString() // input.grep{it.@semantic == "VERTEX"}
     mesh.polylist.each { polylist ->
@@ -60,3 +59,67 @@ brepBuilder.addBrep(shell)
 
 def outfile = new File(args[1])
 brepBuilder.ifcBuilder.write(outfile.parent, outfile.name)
+
+class BrepBuilder {
+  IfcBuilder ifcBuilder = IfcBuilder.newInstance()
+  def world
+  def proxy
+
+  void init() {
+    world = ifcBuilder.geometricRepresentationContext {
+      coordinateSpaceDimension = dimensionCount(3)
+      worldCoordinateSystem = axis2Placement3D {
+        location = cartesianPoint(0, 0, 0)
+        axis = direction(0, 0, 1)
+        refDirection = direction(1, 0, 0)
+      }
+    }
+    proxy = ifcBuilder.proxy {
+      representation = productDefinitionShape {
+        representations = [shapeRepresentation {
+          representationIdentifier = label('Body')
+          representationType = label('Brep')
+          contextOfItems = world
+          items = [] as Set
+        }]
+      }
+    }
+  }
+
+
+  void addBrep(shellParts) {
+
+    proxy.representation.representations.first().items.add(
+            ifcBuilder.facetedBrep {
+              outer = closedShell {
+                def collectedFaces = []
+                shellParts.each { points, polygons ->
+                  points = points.collect { x, y, z -> cartesianPoint(x, y, z) }
+                  polygons.each { polyLoops ->
+                    collectedFaces << face {
+                      def outerLoop = polyLoops.remove(0)
+                      def collectedBounds = [faceOuterBound {
+                        bound = polyLoop {
+                          polygon = outerLoop.collect { i -> points[i] }
+                        }
+                        orientation = true
+                      }]
+                      polyLoops.each { innerLoop ->
+                        collectedBounds << faceBound {
+                          bound = polyLoop {
+                            polygon = innerLoop.collect { i -> points[i] }
+                          }
+                          orientation = false
+                        }
+                      }
+                      bounds = collectedBounds as Set
+                    }
+                  }
+                }
+                cfsFaces = collectedFaces as Set
+              }
+            }
+    )
+  }
+
+}
