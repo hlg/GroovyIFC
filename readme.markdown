@@ -1,4 +1,4 @@
-This is a groovy skript to write IFC geometry from collada files using OpenIfcTools. It does only cover a small subset of the collada standard (basically the part that is used when exporting solid polygonal geometry from Google Sketchup) and it writes only IFC proxy entities. However the heart of the script - IfcBuilder - can be easily used to write arbitrary IFC entities programmatically from arbitrary input data - in a compact and concious fashion. Apart from writing, the combination of Groovy and OpenIfcTools is a very handy way for ad-hoc queries on IFC data. See the the RepresentationCounter example.
+This is a groovy skript to write IFC geometry from collada files using OpenIfcTools. It does only cover a small subset of the collada specification (basically the part that is used when exporting solid polygonal geometry from Google Sketchup) and it writes only IFC proxy entities. However the heart of the script - IfcBuilder - can be easily used to write arbitrary IFC entities programmatically from arbitrary input data - in a compact and concious fashion. Apart from writing, the combination of Groovy and OpenIfcTools is a very handy way for ad-hoc queries on IFC data. See the the RepresentationCounter example.
 
 People asked for it, so I decided to put it out in the wild. Hope it's gonna be useful to anybody. Comes with no warranty.
 
@@ -6,7 +6,7 @@ Prerequisites
 =============
 
 * [Groovy](http://groovy.codehaus.org/)
-* [Open Java Toolbox](http://www.openifctools.com/Open_IFC_Tools/ifc_features.html)
+* [Open IFC Java Toolbox](http://www.openifctools.com/Open_IFC_Tools/ifc_features.html)
 
 
 How to write IFC
