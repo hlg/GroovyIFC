@@ -1,3 +1,5 @@
+package groovy
+
 /* Copyright (c) 2010-2011 Helga Tauscher
  * http://github.com/hlg/GroovyIFC
  *
@@ -41,11 +43,16 @@ class IfcBuilder extends BuilderSupport {
     direction
   }
 
+  protected Object positive(length) {
+    new IfcPositiveLengthMeasure(new IfcLengthMeasure(length))
+  }
+
   protected Object createNode(Object name) {
     ifcClass(name).newInstance()
   }
 
   protected Object createNode(Object name, Object value) {
+    if (value instanceof String) {value = new STRING(value, false)}
     ifcClass(name).newInstance(value)
   }
 
