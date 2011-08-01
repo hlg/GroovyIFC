@@ -1,6 +1,8 @@
-This is a groovy skript to write IFC geometry from collada files using OpenIfcTools. It does only cover a small subset of the collada specification (basically the part that is used when exporting solid polygonal geometry from Google Sketchup) and it writes only IFC proxy entities. However the heart of the script - IfcBuilder - can be easily used to write arbitrary IFC entities programmatically from arbitrary input data - in a compact and concious fashion. Apart from writing, the combination of Groovy and OpenIfcTools is a very handy way for ad-hoc queries on IFC data. See the the RepresentationCounter example.
+This is a growing set of groovy tools to handle [IFC](http://buildingsmart-tech.org/specifications/ifc-overview/) data. GroovyIFC is currently based on the Open IFC Java Toolbox (see prerequisites). The tool set started out as dae2ifc.groovy, a skript to write IFC geometry from collada files.
 
-People asked for it, so I decided to put it out in the wild. Hope it's gonna be useful to anybody. Comes with no warranty.
+The heart of the script - IfcBuilder - can be easily used to write arbitrary IFC entities programmatically from arbitrary input data - in a compact and concious fashion. Apart from writing, the combination of Groovy and OpenIfcTools is a very handy way for ad-hoc queries on IFC data. Another use case is quick and dirty programmatic manipulation of IFC files for research or prototyping purposes (see DeepSpatialHierarchy.groovy). A set of utility methods is bundled in IfcModelHelper.
+
+People asked for it, so I decided to put it out in the wild. Hope it'll gonna be useful to anybody. Comes with no warranty.
 
 Prerequisites
 =============
@@ -54,6 +56,9 @@ How to improve
 ==============
 I'd love to see these improvements, but I'm afraid I won't find the time. Don't hesitate to fork the project.
 
+dae2ifc.groovy:
 * validate manifold Brep geometry
 * optimize ifc file: write each point once only (currently multiple times - once for every polygon)
+
+other use cases:
 * sophisticated example for reading/querying IFC (e.g. representation counter)

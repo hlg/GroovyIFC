@@ -1,9 +1,17 @@
+package scripts
+
+import utils.IfcBuilder
+
 /* Copyright (c) 2010-2011 Helga Tauscher
- * http://github.com/hlg/GroovyIFC
- *
- * This file is part of Groovy Ifc Tools, which are distributed
- * under the terms of the GNU General Public License version 3
- */
+* http://github.com/hlg/GroovyIFC
+*
+* This file is part of Groovy Ifc Tools, which are distributed
+* under the terms of the GNU General Public License version 3
+*
+* This is a script to write IFC geometry from collada files using OpenIfcTools. It does only cover a small subset of
+* the collada specification (basically the part that is used when exporting solid polygonal geometry from Google
+* Sketchup) and it writes only IFC proxy entities.
+*/
 
 def brepBuilder = new BrepBuilder()
 brepBuilder.init()
