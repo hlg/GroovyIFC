@@ -1,17 +1,17 @@
 package utils
 
-import openifctools.com.openifcjavatoolbox.guidcompressor.GuidCompressor
-import openifctools.com.openifcjavatoolbox.ifc2x3tc1.IfcBuildingStorey
-import openifctools.com.openifcjavatoolbox.ifc2x3tc1.IfcProject
-import openifctools.com.openifcjavatoolbox.ifcmodel.IfcModel
-import openifctools.com.openifcjavatoolbox.step.parser.util.StepParserProgressListener
-import openifctools.com.openifcjavatoolbox.step.parser.util.ProgressEvent
+import ifc4javatoolbox.guidcompressor.GuidCompressor
+import ifc4javatoolbox.ifc4.IfcBuildingStorey
+import ifc4javatoolbox.ifc4.IfcProject
+import ifc4javatoolbox.ifcmodel.IfcModel
+import ifc4javatoolbox.step.parser.util.StepParserProgressListener
+import ifc4javatoolbox.step.parser.util.ProgressEvent
 
 class IfcModelHelper {
   def ifcModel = new IfcModel()
   def builder = new IfcBuilder(model: ifcModel)
 
-  void setProgressListener(closure = {ProgressEvent event-> print ((event.currentState % 20) ? '.' : '.\n')}){
+  void setProgressListener(closure = { ProgressEvent event-> print ((event.currentState % 20) ? '.' : '.\n')}){
     ifcModel.addStepParserProgressListener([progressActionPerformed: closure] as StepParserProgressListener)
   }
 

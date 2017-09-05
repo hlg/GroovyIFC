@@ -1,14 +1,14 @@
 package utils
 
-/* Copyright (c) 2010-2011 Helga Tauscher
+/* Copyright (c) 2010-2017 Helga Tauscher
  * http://github.com/hlg/GroovyIFC
  *
  * This file is part of Groovy Ifc Tools, which are distributed
  * under the terms of the GNU General Public License version 3
  */
 
-import openifctools.com.openifcjavatoolbox.ifcmodel.IfcModel
-import openifctools.com.openifcjavatoolbox.ifc2x3tc1.*
+import ifc4javatoolbox.ifcmodel.IfcModel
+import ifc4javatoolbox.ifc4.*
 
 class IfcBuilder extends BuilderSupport {
 
@@ -77,7 +77,7 @@ class IfcBuilder extends BuilderSupport {
   }
 
   protected void nodeCompleted(Object parent, Object node) {
-    if (node instanceof IfcClass) { model.addIfcObject(node) }
+    if (node instanceof ClassInterface) { model.addIfcObject(node) }
   }
 
 
