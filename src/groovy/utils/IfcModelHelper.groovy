@@ -1,4 +1,4 @@
-package utils
+package groovy.utils
 
 import ifc4javatoolbox.guidcompressor.GuidCompressor
 import ifc4javatoolbox.ifc4.IfcBuildingStorey
@@ -16,7 +16,7 @@ class IfcModelHelper {
   }
 
   void setFileName(String fileName) {
-    ifcModel.clearModel()
+    if(ifcModel.typeCache) ifcModel.clearModel()
     ifcModel.readStepFile(new File(fileName))
   }
 

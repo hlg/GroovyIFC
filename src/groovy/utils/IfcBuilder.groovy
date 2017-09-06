@@ -1,4 +1,4 @@
-package utils
+package groovy.utils
 
 /* Copyright (c) 2010-2017 Helga Tauscher
  * http://github.com/hlg/GroovyIFC
@@ -57,7 +57,7 @@ class IfcBuilder extends BuilderSupport {
   }
 
   private ifcClass(name) {
-    def className = "openifctools.com.openifcjavatoolbox.ifc2x3tc1.Ifc" + name[0].toUpperCase() + name[1..-1]
+    def className = "ifc4javatoolbox.ifc4.Ifc" + name[0].toUpperCase() + name[1..-1]
     Class.forName(className)
   }
 
@@ -81,8 +81,8 @@ class IfcBuilder extends BuilderSupport {
   }
 
 
-  def write(String path, String fileName) {
-    model.writeStepfile(new File(path, fileName))
+  def write(File file) {
+    model.writeStepfile(file)
   }
 }
 

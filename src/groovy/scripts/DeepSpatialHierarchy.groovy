@@ -1,9 +1,9 @@
-package scripts
+package groovy.scripts
 
-import openifctools.com.openifcjavatoolbox.guidcompressor.GuidCompressor
-import utils.IfcModelHelper
-import openifctools.com.openifcjavatoolbox.ifc2x3tc1.*
-import openifctools.com.openifcjavatoolbox.step.parser.util.ProgressEvent
+import ifc4javatoolbox.guidcompressor.GuidCompressor
+import groovy.utils.IfcModelHelper
+import ifc4javatoolbox.ifc4.*
+import ifc4javatoolbox.step.parser.util.ProgressEvent
 
 /**
  * @author Helga Tauscher http://github.com/hlg
@@ -25,7 +25,7 @@ import openifctools.com.openifcjavatoolbox.step.parser.util.ProgressEvent
  * assumes all spaces are direct children of storeys in the spatial structure of the original model
 */
 
-def printProgress = {ProgressEvent event->
+def printProgress = { ProgressEvent event->
   if (event.currentState == 1) println event.message
   print ((event.currentState % 50) ? '.' : '.\n')
 }

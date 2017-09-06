@@ -1,6 +1,6 @@
-package scripts
+package groovy.scripts
 
-import utils.IfcBuilder
+import groovy.utils.IfcBuilder
 
 /* Copyright (c) 2010-2011 Helga Tauscher
 * http://github.com/hlg/GroovyIFC
@@ -66,7 +66,7 @@ meshes.each { mesh ->
 brepBuilder.addBrep(shell)
 
 def outfile = new File(args[1])
-brepBuilder.ifcBuilder.write(outfile.parent, outfile.name)
+brepBuilder.ifcBuilder.write(outfile)
 
 class BrepBuilder {
   IfcBuilder ifcBuilder = IfcBuilder.newInstance()
