@@ -1,7 +1,8 @@
 package groovy.scripts
 
+import groovy.utils.IfcModel
 import ifc4javatoolbox.guidcompressor.GuidCompressor
-import groovy.utils.IfcModelHelper
+import groovy.utils.SpatialStructureManipulator
 import ifc4javatoolbox.ifc4.*
 import ifc4javatoolbox.step.parser.util.ProgressEvent
 
@@ -29,8 +30,10 @@ def printProgress = { ProgressEvent event->
   if (event.currentState == 1) println event.message
   print ((event.currentState % 50) ? '.' : '.\n')
 }
-def model = new IfcModelHelper(progressListener: printProgress, fileName: args[0])
-model.printAsciiTree()
+
+def model = new IfcModel(progressListener: printProgress, fileName: args[0])
+def spatialStructure = new SpatialStructureManipulator(model: model)
+spatialStructure.printAsciiTree()
 
 def copyRepresentation(spaceOrigin, spaceDest) {
   spaceDest.representation = spaceOrigin.representation
@@ -40,25 +43,25 @@ def copyRepresentation(spaceOrigin, spaceDest) {
 def marker = [site: 'CIB_Site', building: 'CIB_Gebaude', storeyGroup: 'CIB_Milestone', storey: 'Bruttogeschoss|BGF',
         subStorey: 'Bauabschnitt', subStoreySpace: '-BA']
 
-def spaces = model.ifcModel.getCollection(IfcSpace.class)
-def storeys = model.ifcModel.getCollection(IfcBuildingStorey.class)
-def site = model.ifcModel.ifcObjects.find {it instanceof IfcSite}
-def building = model.ifcModel.ifcObjects.find {it instanceof IfcBuilding}
+def spaces = model.getCollection(IfcSpace.class)
+def storeys = model.getCollection(IfcBuildingStorey.class)
+def site = model.ifcObjects.find {it instanceof IfcSite}
+def building = model.ifcObjects.find {it instanceof IfcBuilding}
 
 spaces.findAll {it.longName.value =~ /$marker.site/}.each { dummySite ->
   copyRepresentation(dummySite, site)
-  model.removeDummySpace(dummySite)
+  spatialStructure.removeDummySpace(dummySite)
 }
 
 spaces.findAll {it.longName.value =~ /$marker.building/}.each {dummyBuilding ->
   copyRepresentation(dummyBuilding, building)
-  model.removeDummySpace(dummyBuilding)
+  spatialStructure.removeDummySpace(dummyBuilding)
 }
 
 spaces.findAll {it.longName.value =~ /$marker.storey/}.each { dummyStorey ->
   dummyStorey.Decomposes_Inverse.each { parentStorey ->    // STEP modelling WTF? set of size 0 or 1
     copyRepresentation(dummyStorey, parentStorey.RelatingObject)
-    model.removeDummySpace(dummyStorey)
+    spatialStructure.removeDummySpace(dummyStorey)
   }
 }
 
@@ -88,7 +91,7 @@ def sortedGroupStoreys = spaces.findAll {it.longName.toString() =~ /$marker.stor
       elevation = parentStorey.relatingObject.elevation
     }
     copyRepresentation(dummyStoreyGroup, storeyGroup)
-    model.removeDummySpace(dummyStoreyGroup)
+    spatialStructure.removeDummySpace(dummyStoreyGroup)
     storeyGroup
   }
 }.flatten().sort {it.elevation.value}.reverse()
@@ -96,6 +99,7 @@ def sortedGroupStoreys = spaces.findAll {it.longName.toString() =~ /$marker.stor
 storeys.groupBy { storey ->
   sortedGroupStoreys.find {storey.elevation.value >= it.elevation.value}
 }.each { groupDummy, storeysInGroup ->
+  assert groupDummy != null
   building.IsDecomposedBy_Inverse.each { parentStorey ->
     parentStorey.addRelatedObjects(groupDummy)
     parentStorey.removeAllRelatedObjects(storeysInGroup)
@@ -108,7 +112,7 @@ storeys.groupBy { storey ->
 }
 
 // save and verify the changed model by parsing it again
-model.ifcModel.writeStepfile(new File(args[1]))
+model.writeStepfile(new File(args[1]))
 model.fileName = args[1]
-model.printAsciiTree()
-println model.ifcModel.numberOfElements
+spatialStructure.printAsciiTree()
+println model.numberOfElements

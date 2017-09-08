@@ -4,21 +4,10 @@ import ifc4javatoolbox.guidcompressor.GuidCompressor
 import ifc4javatoolbox.ifc4.IfcBuildingStorey
 import ifc4javatoolbox.ifc4.IfcProject
 import ifc4javatoolbox.ifcmodel.IfcModel
-import ifc4javatoolbox.step.parser.util.StepParserProgressListener
-import ifc4javatoolbox.step.parser.util.ProgressEvent
 
-class IfcModelHelper {
-  def ifcModel = new IfcModel()
-  def builder = new IfcBuilder(model: ifcModel)
+class SpatialStructureManipulator {
 
-  void setProgressListener(closure = { ProgressEvent event-> print ((event.currentState % 20) ? '.' : '.\n')}){
-    ifcModel.addStepParserProgressListener([progressActionPerformed: closure] as StepParserProgressListener)
-  }
-
-  void setFileName(String fileName) {
-    if(ifcModel.typeCache) ifcModel.clearModel()
-    ifcModel.readStepFile(new File(fileName))
-  }
+  def model = new IfcModel()
 
   def recursePlacement(localPlacement) {
     def result = localPlacement.relativePlacement.location.coordinates[2].value
@@ -29,7 +18,7 @@ class IfcModelHelper {
   }
 
   def fixStoreyAssignment(tolerance) {
-    def storeys = ifcModel.getCollection(IfcBuildingStorey.class)
+    def storeys = model.getCollection(IfcBuildingStorey.class)
     def rangeMap = storeys.collectEntries { [it, [it.elevation.value + tolerance[0], it.elevation.value + tolerance[1]]] }
     storeys.each { storey ->
       println "\n*** $storey $storey.elevation"
@@ -63,12 +52,12 @@ class IfcModelHelper {
 
   }
 
-  def printAsciiTree() {
-    def spatialRoot = ifcModel.ifcObjects.find {it instanceof IfcProject}
+  void printAsciiTree() {
+    def spatialRoot = model.ifcObjects.find {it instanceof IfcProject}
     printAsciiTreeRec(spatialRoot, '')
   }
 
-  def printAsciiTreeRec(spatial, prefix) {
+  void printAsciiTreeRec(spatial, prefix) {
     println "$prefix-$spatial $spatial.name - ${spatial.class.name}";
     def children = spatial.isDecomposedBy_Inverse?.relatedObjects?.flatten()  // TODO: Ifc 2x4 nests_Inverse
     if (children) {
@@ -90,14 +79,14 @@ class IfcModelHelper {
     related.each {k, v ->
       space[k + '_Inverse'].collect {it}.each {
         it.invokeMethod('remove' + v, space)
-        if (it[v].isEmpty()) ifcModel.removeIfcObject(it)
+        if (it[v].isEmpty()) model.removeIfcObject(it)
       }
     }
     relating.each {k, v ->
       def rel = space[k + '_Inverse']
-      if (rel) ifcModel.removeIfcObject(rel)
+      if (rel) model.removeIfcObject(rel)
     }
-    ifcModel.removeIfcObject(space)
+    model.removeIfcObject(space)
   }
 
 }

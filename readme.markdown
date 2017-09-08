@@ -8,7 +8,7 @@ Prerequisites
 =============
 
 * [Groovy](http://groovy.codehaus.org/)
-* [Open IFC Java Toolbox](http://www.openifctools.com/Open_IFC_Tools/ifc_features.html): current GroovyIfc is based on OpenIfcTools 1.0, GroovyIfc v0.1 was based on OpenIfcTools 0.9
+* [IFC Tools Project](http://www.ifctoolsproject.com/): the current development version of GroovyIfc is based on their Java Toolbox 2.0.1
 
 
 How to write IFC
