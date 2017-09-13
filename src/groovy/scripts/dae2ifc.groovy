@@ -69,7 +69,7 @@ def outfile = new File(args[1])
 brepBuilder.ifcBuilder.write(outfile)
 
 class BrepBuilder {
-  IfcBuilder ifcBuilder = IfcBuilder.newInstance()
+  IfcBuilder ifcBuilder = new IfcBuilder()
   def world
   def proxy
 

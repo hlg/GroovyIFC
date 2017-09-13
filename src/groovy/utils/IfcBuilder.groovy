@@ -12,20 +12,14 @@ import ifc4javatoolbox.ifc4.*
 
 class IfcBuilder extends BuilderSupport {
 
-  IfcModel model
-
-  public static IfcBuilder newInstance() {
-    def builder = new IfcBuilder()
-    builder.@model = new IfcModel()
-    builder
-  }
+  IfcModel model =  [checkAndSetMinimumRequirements: {}] as IfcModel
 
   protected void setParent(Object parent, Object child) {}
 
   public void setProperty(String name, Object value) {
     if (value instanceof List) {value = new LIST(value)}
     if (value instanceof Set) {value = new SET(value)}
-    if (value instanceof Boolean) {value = new BOOLEAN(value)}
+    if (value instanceof Boolean) {value = new IfcBoolean(value)}
     current[name] = value
   }
 
@@ -52,8 +46,9 @@ class IfcBuilder extends BuilderSupport {
   }
 
   protected Object createNode(Object name, Object value) {
-    if (value instanceof String) {value = new STRING(value, false)}
-    ifcClass(name).newInstance(value)
+    def ifcClass = ifcClass(name)
+    def needStringEncoding = value instanceof String && !(ENUM.isAssignableFrom(ifcClass))
+    ifcClass.newInstance(needStringEncoding ? new STRING(value as String, false) : value)
   }
 
   private ifcClass(name) {
@@ -71,7 +66,7 @@ class IfcBuilder extends BuilderSupport {
     createNode(name, attributes)   // syntax with value needed?
   }
 
-  protected void setClosureDelegate(Closure closure, Object node) {
+  protected void setClosureDelegate(@DelegatesTo Closure closure, @DelegatesTo.Target Object node) {
     super.setClosureDelegate(closure, node)
     closure.resolveStrategy = Closure.DELEGATE_FIRST
   }
@@ -81,8 +76,17 @@ class IfcBuilder extends BuilderSupport {
   }
 
 
-  def write(File file) {
-    model.writeStepfile(file)
+  def write(File file, description='Example', author='', organization='', system='Groovy IFC', authorization = 'not authorized' ) {
+    model.file_Description = [description: [[encodedValue: description] as STRING] as LIST] as File_Description // new File_Description(description: [new STRING(encodedValue: 'Example file')])
+    model.file_Name = [
+      author: [[encodedValue: author] as STRING] as LIST,
+      organization: [[encodedValue: organization] as STRING] as LIST,
+      originatingSystem: [encodedValue: system] as STRING,
+      authorization: [encodedValue: authorization] as STRING
+    ] as File_Name
+    file.withOutputStream { os ->
+      model.writeStepfile(os)
+    }
   }
 }
 
