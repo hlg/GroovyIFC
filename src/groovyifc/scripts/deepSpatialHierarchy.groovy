@@ -1,8 +1,8 @@
-package groovy.scripts
+package groovyifc.scripts
 
-import groovy.utils.IfcModel
+import groovyifc.utils.IfcModel
 import ifc4javatoolbox.guidcompressor.GuidCompressor
-import groovy.utils.SpatialStructureManipulator
+import groovyifc.utils.SpatialStructureManipulator
 import ifc4javatoolbox.ifc4.*
 import ifc4javatoolbox.step.parser.util.ProgressEvent
 

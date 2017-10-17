@@ -1,4 +1,4 @@
-package groovy.utils;
+package groovyifc.utils;
 
 import ifc4javatoolbox.step.parser.util.ProgressEvent
 import ifc4javatoolbox.step.parser.util.StepParserProgressListener;

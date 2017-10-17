@@ -1,4 +1,4 @@
-package groovy.utils
+package groovyifc.utils
 
 import ifc4javatoolbox.guidcompressor.GuidCompressor
 import ifc4javatoolbox.ifc4.IfcBuildingStorey

@@ -1,6 +1,6 @@
-package groovy.scripts
+package groovyifc.scripts
 
-import groovy.utils.IfcBuilder
+import groovyifc.utils.IfcBuilder
 
 /* Copyright (c) 2010-2011 Helga Tauscher
 * http://github.com/hlg/GroovyIFC

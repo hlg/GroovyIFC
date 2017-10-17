@@ -1,4 +1,4 @@
-package groovy.utils
+package groovyifc.utils
 
 /* Copyright (c) 2010-2017 Helga Tauscher
  * http://github.com/hlg/GroovyIFC
