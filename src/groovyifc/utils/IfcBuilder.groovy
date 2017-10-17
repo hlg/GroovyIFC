@@ -20,6 +20,7 @@ class IfcBuilder extends BuilderSupport {
     if (value instanceof List) {value = new LIST(value)}
     if (value instanceof Set) {value = new SET(value)}
     if (value instanceof Boolean) {value = new IfcBoolean(value)}
+    if (value instanceof Integer) {value = new INTEGER(value)}
     current[name] = value
   }
 
