@@ -7,7 +7,7 @@ People asked for it, so I decided to put it out in the wild. Hope it'll gonna be
 Prerequisites
 =============
 
-* [Groovy](http://groovy.codehaus.org/)
+* [Groovy](http://groovy-lang.org/)
 * [IFC Tools Project](http://www.ifctoolsproject.com/): the current development version of GroovyIfc is based on their Java Toolbox 2.0.1
 
 
