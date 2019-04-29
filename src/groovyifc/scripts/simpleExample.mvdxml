@@ -1,0 +1,67 @@
+<mvdXML name='example MVD for mvdXML documentation sensor signals' uuid='4afb1a8b-0b61-4ff8-9863-c10690fe06f2' xmlns='http://buildingsmart-tech.org/mvd/XML/1.1' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://buildingsmart-tech.org/mvd/XML/1.1 ../mvdXML_V1.1.xsd'>
+  <Templates>
+    <ConceptTemplate uuid='00000000-0000-0000-0000-000000000001' name='Port Assigment' applicableSchema='IFC4' applicableEntity='IfcDistributionElement'>
+      <Definitions>
+        <Definition>
+          <Body>Distribution ports are defined by IfcDistributionPort and attached by the IfcRelNests relationship. Ports can be distinguished by the IfcDistributionPort attributes Name, PredefinedType, and FlowDirection</Body>
+        </Definition>
+      </Definitions>
+      <Rules>
+        <AttributeRule AttributeName='IsNestedBy'>
+          <EntityRules>
+            <EntityRule EntityName='IfcRelNests'>
+              <AttributeRules>
+                <AttributeRule AttributeName='Name' RuleID='Name' />
+                <AttributeRule AttributeName='PredefinedType' RuleID='Type' />
+                <AttributeRule AttributeName='FlowDirection' RuleID='Flow' />
+              </AttributeRules>
+            </EntityRule>
+          </EntityRules>
+        </AttributeRule>
+      </Rules>
+    </ConceptTemplate>
+  </Templates>
+  <Views>
+    <ModelView uuid='00000000-0000-0000-0000-000000000003' name='Sensor signal view' applicableSchema='IFC4' code='Sensor'>
+      <Definitions>
+        <Definition>
+          <Body lang='en'>ModelView for mvdXML 1.1 documentation.&gt;</Body>
+        </Definition>
+      </Definitions>
+      <ExchangeRequirements>
+        <ExchangeRequirement uuid='00000000-0000-0000-0000-000000000002' name='Distribution signal' code='ERM1' applicability='export'>
+          <Definitions>
+            <Definition>
+              <Body lang='en'>Simple example for checking sensor elements to always submit signals.</Body>
+            </Definition>
+          </Definitions>
+        </ExchangeRequirement>
+      </ExchangeRequirements>
+      <Roots>
+        <ConceptRoot uuid='00000000-0000-0000-0000-000000000004' name='Sensor' applicableRootEntity='IfcSensor'>
+          <Definitions>
+            <Definition>
+              <Body lang='en'>Concept to validate that every sensor element has a port defined that submits signals</Body>
+            </Definition>
+          </Definitions>
+          <Concepts>
+            <Concept uuid='00000000-0000-0000-0000-000000000005' name='Port Assignment'>
+              <Definitions>
+                <Definition>
+                  <Body lang='en'>Concept to validate that every sensor has a port defined that submits signals.</Body>
+                </Definition>
+              </Definitions>
+              <Template ref='00000000-0000-0000-0000-000000000001' />
+              <Requirements>
+                <Requirement exchangeRequirement='00000000-0000-0000-0000-000000000002' requirement='mandatory' applicability='export' />
+              </Requirements>
+              <TemplateRules>
+                <TemplateRule Parameters='Name[Value]=&apos;Output&apos; AND Type[Value]=&apos;SIGNAL&apos; AND Flow[Value]=&apos;SOURCE&apos;' Description='Transmits signal.' />
+              </TemplateRules>
+            </Concept>
+          </Concepts>
+        </ConceptRoot>
+      </Roots>
+    </ModelView>
+  </Views>
+</mvdXML>
