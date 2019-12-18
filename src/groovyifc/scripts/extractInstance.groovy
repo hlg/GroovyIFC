@@ -1,5 +1,7 @@
 // usage: groovy extractInstance.groovy <input.ifc> #<entity number> <extracted.ifc>
 
+import groovy.transform.Field
+
 if (args.size() < 3) {
   println "usage: groovy extractInstance.groovy <input.ifc> #<entity number> <output.ifc>"
   System.exit(1)
@@ -9,7 +11,14 @@ def pattern = /#[0-9]+/
 table = [:]
 include = [] as Set
 
-new File(args[0]).eachLine{ line ->
+def schemaPattern = /FILE_SCHEMA\(\((.*)\)\)/
+@Field schema
+
+
+originalFile = new File(args[0])
+originalFile.eachLine{ line ->
+  def schemaMatch = (line.replaceAll("\\s","") =~ schemaPattern).collect{it[1]}
+  if (schemaMatch) { schema = schemaMatch[0][1..-2]; return }
   def matches = (line =~ pattern).collect{ it as String } // workaround failing groovy magic
   if (!matches) return
   table[matches[0]] = [line, matches.size() > 1 ? matches[1..-1] : []]
@@ -23,7 +32,8 @@ def traverseRefs(root, todo){
   }
 }
 
-args[1].split(',').each{ searched ->
+entities = args[1].split(',')
+entities.each{ searched ->
   if (table[searched]) {
     traverseRefs(searched, {no -> include << no})
     println "Finished extracting entity $searched"
@@ -39,9 +49,9 @@ def writeExtract(){
   file.withWriter{ writer ->
     writer << """ISO-10303-21;
 HEADER;
-FILE_DESCRIPTION(('Extracted entity'),'2;1');
+FILE_DESCRIPTION(('Extracted entit${entities.size()>1?'ies':'y'} ${entities.join(',#')} from $originalFile.name'),'2;1');
 FILE_NAME('$file.name','$date',('',''),(''),'','','');
-FILE_SCHEMA(('IFC4'));
+FILE_SCHEMA(('$schema'));
 ENDSEC;
 
 DATA;
@@ -54,7 +64,6 @@ DATA;
   }
 } 
 
-// TODO: extract IFC version from original file
 // TODO: extract specific instances via some GPath-like syntax, needs proper parser
 
 
