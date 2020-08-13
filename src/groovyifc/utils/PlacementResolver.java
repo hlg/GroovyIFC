@@ -1,13 +1,10 @@
 package groovyifc.utils;
 
 import org.bimserver.models.ifc4.*;
-import org.eclipse.emf.common.util.EList;
-
+import java.util.List;
 import javax.vecmath.Matrix3d;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class PlacementResolver {
 
@@ -95,63 +92,8 @@ public class PlacementResolver {
         return xAxis;
     }
 
-    private static Vector3d vectorFor(EList<Double> coords) {
+    private static Vector3d vectorFor(List<Double> coords) {
         return new Vector3d(coords.get(0), coords.get(1), coords.size()>2 ? coords.get(2) : 0);
-    }
-
-    public static double[] calculateExtrusionOffsetXyz(List<Double> offset, double depth) {
-        double ratio = depth / Math.sqrt(Math.pow(offset.get(0), 2) + Math.pow(offset.get(1), 2) + Math.pow(offset.get(2), 2));
-        double[] offsetXyz = new double[3];
-        for (int xyz = 0; xyz < 3; xyz++) {
-            offsetXyz[xyz] = ratio * offset.get(xyz);
-        }
-        return offsetXyz;
-    }
-
-    public static Vector3d getExtrusionOffset() {
-        EList<Double> extDir = ((IfcDirection) TypedConverter.parameters.getParam("extDir")).getDirectionRatios();
-        double extDepth= (double) TypedConverter.parameters.getParam("extDepth");
-        return new Vector3d(calculateExtrusionOffsetXyz(extDir, extDepth));
-    }
-
-    public static List<Double> createPointList(Transformation productTransformation, Transformation shapeTransformation, List<Point3d> points) {
-        List<Double> ptList = new ArrayList<>(12);
-        for(Point3d pt: points){
-            Point3d absPt = new Point3d(pt);
-            getAbsolutePoint(shapeTransformation, absPt);
-            getAbsolutePoint(productTransformation, absPt);
-            ptList.addAll(Arrays.asList(absPt.getX(),absPt.getY(),absPt.getZ()));
-        }
-        return ptList;
-    }
-
-    public static boolean isCounterClockwise(List<Point3d> pline){
-        assert pline.get(0).equals(pline.get(pline.size()-1));
-        assert pline.stream().allMatch( p -> p.z == 0);
-        double area = 0;
-        for(int i=0; i<=pline.size()-2; i++){
-            area += (pline.get(i+1).x -pline.get(i).x)*(pline.get(i+1).y+pline.get(i).y);
-        }
-        return area < 0;
-    }
-
-    public static Set<List<Point3d>> extrude(List<Point3d> basePoints, List<Point3d> transformed) throws TypeException {
-        Set<List<Point3d>> faces = new HashSet<>();
-        if(basePoints.size()>1) {
-            int lastIndex = basePoints.size() - 1;
-            for (int i = 0; i < lastIndex; i++) {
-                faces.add(Arrays.asList(basePoints.get(i + 1), basePoints.get(i), transformed.get(i), transformed.get(i + 1), basePoints.get(i+1)));
-            }
-        }
-        return faces;
-    }
-
-    public static List<Point3d> translate(List<Point3d> basePoints, Vector3d extrusionOffsetXyz) {
-        return basePoints.stream().map(pt -> {
-                    Point3d offset = new Point3d(pt);
-                    offset.add(extrusionOffsetXyz);
-                    return offset;
-                }).collect(Collectors.toList());
     }
 
     public static class Transformation {
