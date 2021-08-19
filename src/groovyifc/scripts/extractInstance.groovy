@@ -58,9 +58,13 @@ DATA;
 """.denormalize()
     include = include.sort{ Integer.valueOf(it[1..-1])}
     def extracted = include.collect{ table[it][0] }
-    include.eachWithIndex{ no, i -> (0..extracted.size-1).each{ k -> extracted[k] = extracted[k].replaceAll( "$no(\\D)","#${i+1}\$1") } } 
+    println "Finished collecting"
+    include.eachWithIndex{ no, i -> 
+       (0..extracted.size-1).each{ k -> extracted[k] = extracted[k].replaceAll( "$no(\\D)","#${i+1}\$1") } 
+    } 
     extracted.each{ writer.writeLine(it) }
     writer << 'ENDSEC;\nEND-ISO-10303-21;'
+    println "Finished writing"
   }
 } 
 
