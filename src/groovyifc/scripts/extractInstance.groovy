@@ -7,24 +7,28 @@ if (args.size() < 3) {
   System.exit(1)
 }
 
+boolean reindex = false // There must be a more efficient way using the table to reindex
 def pattern = /#[0-9]+/
 table = [:]
-include = [] as Set
-isLinux = System.properties['os.name'].toLowerCase().contains('linux')
+include = [] as HashSet
+isLinux = false // System.properties['os.name'].toLowerCase().contains('linux')
 
 def schemaPattern = /FILE_SCHEMA\(\((.*)\)\)/
 @Field schema
 
 originalFile = new File(args[0])
-originalFile.eachLine{ line ->
+originalFile.eachLine{ line, i ->
   def schemaMatch = (line.replaceAll("\\s","") =~ schemaPattern).collect{it[1]}
   if (schemaMatch) { schema = schemaMatch[0][1..-2]; return }
-  if(!isLinux){
+  if(!isLinux){ // TODO fully skip
     def matches = (line =~ pattern).collect{ it as String } // workaround failing groovy magic
     if (!matches) return
-    table[matches[0]] = [line, matches.size() > 1 ? matches[1..-1] : []]
+    int mi = matches[0][1..-1] as int
+    // println mi
+    table[mi] = [i, matches.size() > 1 ? matches[1..-1].collect{it[1..-1] as int} : []]
   }
 }
+
 
 def traverseRefs(root, todo, lookup){
   todo(root)
@@ -56,10 +60,11 @@ entities.each{ searched ->
       }
     })
   } else {
-    if (table[searched]) {
-      traverseRefs(searched, {no ->
-        assert table[no]  
-        include << no
+    def searchedIdx = searched[1..-1] as int
+    if (table[searchedIdx]) {
+      traverseRefs(searchedIdx, {no ->
+        // assert table[no]  
+        include << table[no][0]
       }, {no -> table[no][1]})
       println "Finished extracting entity $searched"
     } else {
@@ -71,8 +76,20 @@ entities.each{ searched ->
 writeExtract( isLinux ? {
   data.toString().split('\n')
 } : {
-  include = include.sort{ Integer.valueOf(it[1..-1])}
-  include.collect{ table[it][0] }
+  includeIt = include.sort().iterator() // should already be sorted
+  println "including ${include.size()} elements"
+  def current = includeIt.next()
+  def included = []
+  originalFile.eachLine{ line, i ->
+     if(i==current) {
+       // println i
+       included << line
+       if(includeIt.hasNext()){
+         current = includeIt.next()
+       }
+     }
+  }
+  included
 })
 
 def writeExtract(collectData){
@@ -88,12 +105,12 @@ ENDSEC;
 
 DATA;
 """.denormalize()
-    extracted = collectData()
+    extracted = collectData() // don't put this in memory first, replace and write on the go
     println "Finished collecting"
-    println extracted
-    include.eachWithIndex{ no, i -> 
+    if(reindex) include.eachWithIndex{ no, i -> 
        (0..extracted.size()-1).each{ k -> extracted[k] = extracted[k].replaceAll( "$no(\\D)","#${i+1}\$1") } 
     } 
+    */ 
     extracted.each{ writer.writeLine(it) }
     writer << 'ENDSEC;\nEND-ISO-10303-21;'
     println "Finished writing"
