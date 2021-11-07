@@ -10,40 +10,72 @@ if (args.size() < 3) {
 def pattern = /#[0-9]+/
 table = [:]
 include = [] as Set
+isLinux = System.properties['os.name'].toLowerCase().contains('linux')
 
 def schemaPattern = /FILE_SCHEMA\(\((.*)\)\)/
 @Field schema
-
 
 originalFile = new File(args[0])
 originalFile.eachLine{ line ->
   def schemaMatch = (line.replaceAll("\\s","") =~ schemaPattern).collect{it[1]}
   if (schemaMatch) { schema = schemaMatch[0][1..-2]; return }
-  def matches = (line =~ pattern).collect{ it as String } // workaround failing groovy magic
-  if (!matches) return
-  table[matches[0]] = [line, matches.size() > 1 ? matches[1..-1] : []]
-}
-
-def traverseRefs(root, todo){
-  assert table[root]
-  todo(root)
-  table[root][1].each{ ref ->
-    traverseRefs(ref, todo)
+  if(!isLinux){
+    def matches = (line =~ pattern).collect{ it as String } // workaround failing groovy magic
+    if (!matches) return
+    table[matches[0]] = [line, matches.size() > 1 ? matches[1..-1] : []]
   }
 }
 
+def traverseRefs(root, todo, lookup){
+  todo(root)
+  lookup(root).each{ ref ->
+    traverseRefs(ref, todo, lookup)
+  }
+}
+
+def grepEntity(no, out, err){
+  println "search $no"
+  def proc = ['grep',"$no\\s*=", args[0]].execute()
+  proc.consumeProcessOutput(out, err)
+  proc.waitForOrKill(5000) 
+  proc.exitValue()
+}
+
+data = new StringBuffer()
 entities = args[1].split(',')
 entities.each{ searched ->
-  if (table[searched]) {
-    traverseRefs(searched, {no -> include << no})
-    println "Finished extracting entity $searched"
+  if (isLinux){
+    println args[0]
+    traverseRefs(searched, {no -> include << no}, {no -> 
+      def out = new StringBuffer()
+      def err = new StringBuffer()
+      if (!grepEntity(no, out, err)){ // exitValue 0: successful grep
+        data << out.toString() // table[no] = [out] // toString?
+        def matches = (out =~ pattern).collect{ it as String } // not necessary here?
+        (matches && matches.size()>1) ? matches[1..-1] - include : []
+      }
+    })
   } else {
-    println "Enitity $searched not found in ${args[0]}"
+    if (table[searched]) {
+      traverseRefs(searched, {no ->
+        assert table[no]  
+        include << no
+      }, {no -> table[no][1]})
+      println "Finished extracting entity $searched"
+    } else {
+      println "Enitity $searched not found in ${args[0]}"
+    }
   }
 }
-writeExtract()
 
-def writeExtract(){
+writeExtract( isLinux ? {
+  data.toString().split('\n')
+} : {
+  include = include.sort{ Integer.valueOf(it[1..-1])}
+  include.collect{ table[it][0] }
+})
+
+def writeExtract(collectData){
   def file = new File(args[2])
   def date = new Date().format("yyyy-MM-dd'T'HH:mm:ss", TimeZone.getTimeZone("UTC")) 
   file.withWriter{ writer ->
@@ -56,11 +88,11 @@ ENDSEC;
 
 DATA;
 """.denormalize()
-    include = include.sort{ Integer.valueOf(it[1..-1])}
-    def extracted = include.collect{ table[it][0] }
+    extracted = collectData()
     println "Finished collecting"
+    println extracted
     include.eachWithIndex{ no, i -> 
-       (0..extracted.size-1).each{ k -> extracted[k] = extracted[k].replaceAll( "$no(\\D)","#${i+1}\$1") } 
+       (0..extracted.size()-1).each{ k -> extracted[k] = extracted[k].replaceAll( "$no(\\D)","#${i+1}\$1") } 
     } 
     extracted.each{ writer.writeLine(it) }
     writer << 'ENDSEC;\nEND-ISO-10303-21;'
